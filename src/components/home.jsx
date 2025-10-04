@@ -3,12 +3,20 @@ import "./home.css";
 
 function TodoList() {
   const [input, setInput] = useState("");
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState(
+    JSON.parse(localStorage.getItem("todoList")) || []
+  );
   const keyDown = (event) => {
     if (event.key === "Enter") {
       addTask();
     }
   };
+
+  // function to save task in local storage
+  function save() {
+    localStorage.setItem("todoList", JSON.stringify(todos));
+  }
+  save();
 
   // Add Task Function
 
@@ -17,6 +25,7 @@ function TodoList() {
     temp.push(input);
     setTodos(temp);
     setInput("");
+    save();
   }
 
   // Edit Function
@@ -26,6 +35,7 @@ function TodoList() {
     const newTask = prompt("Enter New Task", todos[idx]);
     newTodos.splice(idx, 1, newTask);
     setTodos(newTodos);
+    save();
   }
 
   // Delete Function
@@ -35,6 +45,7 @@ function TodoList() {
     newTodos.splice(idx, 1);
     // console.log(todos);
     setTodos(newTodos);
+    save();
   }
 
   return (
