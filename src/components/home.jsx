@@ -6,6 +6,8 @@ function TodoList() {
   const [todos, setTodos] = useState(
     JSON.parse(localStorage.getItem("todoList")) || []
   );
+  const [editIdx, setEditIdx] = useState(null);
+
   const keyDown = (event) => {
     if (event.key === "Enter") {
       addTask();
@@ -21,21 +23,36 @@ function TodoList() {
   // Add Task Function
 
   function addTask() {
-    let temp = [...todos];
-    temp.push(input);
-    setTodos(temp);
-    setInput("");
-    save();
+    if (editIdx === null) {
+      let temp = [...todos];
+      if (input.trim() !== "") {
+        temp.push(input);
+        setTodos(temp);
+        setInput("");
+        save();
+      } else {
+        alert("Please enter task");
+      }
+    } else {
+      if (input.trim() !== "") {
+        const newTodos = [...todos];
+        newTodos.splice(editIdx, 1, input);
+        setTodos(newTodos);
+        setInput("");
+        save();
+        setEditIdx(null);
+      } else {
+        alert("Please enter task");
+      }
+    }
   }
 
   // Edit Function
 
   function edit(idx) {
     const newTodos = [...todos];
-    const newTask = prompt("Enter New Task", todos[idx]);
-    newTodos.splice(idx, 1, newTask);
-    setTodos(newTodos);
-    save();
+    setInput(todos[idx]);
+    setEditIdx(idx);
   }
 
   // Delete Function
@@ -77,7 +94,6 @@ function TodoList() {
             </svg>
             <input
               placeholder="Add a new task"
-              //   aria-label="Add task"
               value={input}
               onKeyDown={keyDown}
               onChange={(e) => {
@@ -87,8 +103,11 @@ function TodoList() {
           </div>
 
           <button className="btn" onClick={addTask}>
-            Add
+            {editIdx === null ? "Add" : "Edit"}
           </button>
+          {/* <button className="btn" onClick={editTask}>
+            Edit
+          </button> */}
         </div>
         <div className="list">
           {todos.map((todo, index) => {
